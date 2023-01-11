@@ -1,0 +1,25 @@
+[metadata]
+version = "1.0"
+
+[versions]
+errorprone = "2.16"
+errorproneGradle = "3.0.1"
+junit = "5.9.1"
+indra = "3.0.1"
+spongeConvention = "2.1.1"
+spotless = "6.11.0"
+
+[libraries]
+errorprone = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
+errorprone-annotations = { module = "com.google.errorprone:error_prone_annotations", version.ref = "errorprone" }
+
+junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+
+[plugins]
+errorprone = { id = "net.ltgt.errorprone", version.ref = "errorproneGradle" }
+indra = { id = "net.kyori.indra", version.ref = "indra" }
+indra-crossdoc = { id = "net.kyori.indra.crossdoc", version.ref = "indra" }
+indra-sonatype = { id = "net.kyori.indra.publishing.sonatype", version.ref = "indra" }
+spongeConvention = { id = "org.spongepowered.gradle.sponge.dev", version.ref = "spongeConvention" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

@@ -1,0 +1,65 @@
+plugins {
+    alias libs.plugins.spongeConvention
+    alias libs.plugins.spotless
+    alias libs.plugins.errorprone
+    alias libs.plugins.indra.sonatype
+    alias libs.plugins.indra
+    alias libs.plugins.indra.crossdoc
+    id 'jacoco'
+}
+
+group 'org.spongepowered'
+version '1.0.0-SNAPSHOT'
+description 'A helper library to allow running JUnit tests in a ModLauncher context.'
+
+dependencies {
+    api "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    implementation "cpw.mods:modlauncher:$modlauncherVersion"
+
+    testImplementation libs.junit.api
+    testRuntimeOnly libs.junit.engine
+    errorprone libs.errorprone
+    errorprone libs.errorprone.annotations
+}
+
+indraCrossdoc {
+    baseUrl providers.gradleProperty('javadocPublishRoot')
+}
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+}
+
+processResources {
+    from(rootProject.rootDir) {
+        include 'LICENSE.txt'
+        def projectName = project.name
+        rename { "LICENSE_${projectName}.txt" }
+    }
+}
+
+spongeConvention {
+    repository("modlauncher-injector-junit") {
+        ci(true)
+        publishing(true)
+    }
+    mitLicense()
+}
+
+spotless {
+    java {
+        endWithNewline()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        removeUnusedImports()
+        formatAnnotations()
+    }
+}
+
+indra {
+    javaVersions().minimumToolchain 17
+}
