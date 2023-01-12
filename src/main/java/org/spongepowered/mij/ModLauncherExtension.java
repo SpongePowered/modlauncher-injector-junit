@@ -27,6 +27,7 @@ package org.spongepowered.mij;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 import org.junit.jupiter.api.extension.TestInstantiationException;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -41,8 +42,8 @@ public abstract class ModLauncherExtension implements MethodInvocationIntercepto
     public <T> T interceptTestClassConstructor(Invocation<T> invocation, ReflectiveInvocationContext<Constructor<T>> invocationContext,
             ExtensionContext extensionContext) throws Throwable {
         invocation.skip();
-        return (T) ReflectionUtil.makeAccessible(getTransformedConstructor(invocationContext.getExecutable()))
-                .newInstance(invocationContext.getArguments().toArray());
+        return (T) ReflectionUtils.newInstance(getTransformedConstructor(invocationContext.getExecutable()),
+                invocationContext.getArguments().toArray());
     }
 
     @SuppressWarnings("unchecked")
@@ -50,7 +51,7 @@ public abstract class ModLauncherExtension implements MethodInvocationIntercepto
     public <T> T interceptMethod(Invocation<T> invocation, ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext) throws Throwable {
         invocation.skip();
-        return (T) ReflectionUtil.makeAccessible(getTransformedMethod(invocationContext.getExecutable())).invoke(
+        return (T) ReflectionUtils.invokeMethod(getTransformedMethod(invocationContext.getExecutable()),
                 invocationContext.getTarget().orElse(null), invocationContext.getArguments().toArray());
     }
 
