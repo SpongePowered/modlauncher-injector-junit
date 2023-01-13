@@ -31,19 +31,24 @@ import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * A JUnit extension booting ModLauncher and executing tests inside the transforming class loader.
  */
 public abstract class ModLauncherExtension implements MethodInvocationInterceptor {
+    private final Map<Object, Object> originalToTransformedInstances = new WeakHashMap<>();
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T interceptTestClassConstructor(Invocation<T> invocation, ReflectiveInvocationContext<Constructor<T>> invocationContext,
             ExtensionContext extensionContext) throws Throwable {
-        invocation.skip();
-        return (T) ReflectionUtils.newInstance(getTransformedConstructor(invocationContext.getExecutable()),
+        final T originalInstance = invocation.proceed();
+        final Object transformedInstance = ReflectionUtils.newInstance(getTransformedConstructor(invocationContext.getExecutable()),
                 invocationContext.getArguments().toArray());
+
+        this.originalToTransformedInstances.put(originalInstance, transformedInstance);
+        return originalInstance;
     }
 
     @SuppressWarnings("unchecked")
@@ -52,7 +57,20 @@ public abstract class ModLauncherExtension implements MethodInvocationIntercepto
             ExtensionContext extensionContext) throws Throwable {
         invocation.skip();
         return (T) ReflectionUtils.invokeMethod(getTransformedMethod(invocationContext.getExecutable()),
-                invocationContext.getTarget().orElse(null), invocationContext.getArguments().toArray());
+                getTransformedInstance(invocationContext.getTarget().orElse(null)), invocationContext.getArguments().toArray());
+    }
+
+    protected Object getTransformedInstance(Object originalInstance) {
+        if (originalInstance == null) {
+            return null;
+        }
+
+        final Object transformedInstance = this.originalToTransformedInstances.get(originalInstance);
+        if (transformedInstance == null) {
+            throw new TestInstantiationException("Could not find transformed instance for " + originalInstance);
+        }
+
+        return transformedInstance;
     }
 
     protected Constructor<?> getTransformedConstructor(Constructor<?> originalConstructor) {
