@@ -44,8 +44,18 @@ public abstract class ModLauncherExtension implements MethodInvocationIntercepto
     public <T> T interceptTestClassConstructor(Invocation<T> invocation, ReflectiveInvocationContext<Constructor<T>> invocationContext,
             ExtensionContext extensionContext) throws Throwable {
         final T originalInstance = invocation.proceed();
-        final Object transformedInstance = ReflectionUtils.newInstance(getTransformedConstructor(invocationContext.getExecutable()),
-                invocationContext.getArguments().toArray());
+
+        final Thread thread = Thread.currentThread();
+        final ClassLoader originalClassLoader = thread.getContextClassLoader();
+
+        final Object transformedInstance;
+        try {
+            thread.setContextClassLoader(getTransformingClassLoader());
+            transformedInstance = ReflectionUtils.newInstance(getTransformedConstructor(invocationContext.getExecutable()),
+                    invocationContext.getArguments().toArray());
+        } finally {
+            thread.setContextClassLoader(originalClassLoader);
+        }
 
         this.originalToTransformedInstances.put(originalInstance, transformedInstance);
         return originalInstance;
@@ -56,8 +66,17 @@ public abstract class ModLauncherExtension implements MethodInvocationIntercepto
     public <T> T interceptMethod(Invocation<T> invocation, ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext) throws Throwable {
         invocation.skip();
-        return (T) ReflectionUtils.invokeMethod(getTransformedMethod(invocationContext.getExecutable()),
-                getTransformedInstance(invocationContext.getTarget().orElse(null)), invocationContext.getArguments().toArray());
+
+        final Thread thread = Thread.currentThread();
+        final ClassLoader originalClassLoader = thread.getContextClassLoader();
+
+        try {
+            thread.setContextClassLoader(getTransformingClassLoader());
+            return (T) ReflectionUtils.invokeMethod(getTransformedMethod(invocationContext.getExecutable()),
+                    getTransformedInstance(invocationContext.getTarget().orElse(null)), invocationContext.getArguments().toArray());
+        } finally {
+            thread.setContextClassLoader(originalClassLoader);
+        }
     }
 
     protected Object getTransformedInstance(Object originalInstance) {

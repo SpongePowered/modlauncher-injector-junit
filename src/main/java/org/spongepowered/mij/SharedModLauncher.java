@@ -46,13 +46,15 @@ public class SharedModLauncher {
             final Thread thread = Thread.currentThread();
             final ClassLoader originalClassLoader = thread.getContextClassLoader();
 
-            Launcher.main(launcherArgs);
+            try {
+                Launcher.main(launcherArgs);
 
-            // Capture the context class loader set by ModLauncher
-            SharedModLauncher.transformingClassLoader = thread.getContextClassLoader();
-
-            // Restore the original context class loader to avoid potential issues with classic tests
-            thread.setContextClassLoader(originalClassLoader);
+                // Capture the context class loader set by ModLauncher
+                SharedModLauncher.transformingClassLoader = thread.getContextClassLoader();
+            } finally {
+                // Restore the original context class loader to avoid potential issues with classic tests
+                thread.setContextClassLoader(originalClassLoader);
+            }
         }
 
         return SharedModLauncher.transformingClassLoader;
