@@ -32,6 +32,7 @@ import cpw.mods.modlauncher.Launcher;
  */
 public class SharedModLauncher {
     private static ClassLoader transformingClassLoader;
+    private static boolean launcherFailed = false;
 
     /**
      * Returns the shared transforming class loader.
@@ -43,6 +44,11 @@ public class SharedModLauncher {
      */
     public static ClassLoader getTransformingClassLoader(String[] launcherArgs) {
         if (SharedModLauncher.transformingClassLoader == null) {
+            if (SharedModLauncher.launcherFailed) {
+                // Don't attempt to relaunch ModLaunch when it failed
+                throw new IllegalStateException("ModLauncher has previously failed to launch");
+            }
+
             final Thread thread = Thread.currentThread();
             final ClassLoader originalClassLoader = thread.getContextClassLoader();
 
@@ -51,6 +57,9 @@ public class SharedModLauncher {
 
                 // Capture the context class loader set by ModLauncher
                 SharedModLauncher.transformingClassLoader = thread.getContextClassLoader();
+            } catch (RuntimeException e) {
+                SharedModLauncher.launcherFailed = true;
+                throw e;
             } finally {
                 // Restore the original context class loader to avoid potential issues with classic tests
                 thread.setContextClassLoader(originalClassLoader);
