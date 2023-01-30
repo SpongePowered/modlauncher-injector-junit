@@ -9,7 +9,7 @@ plugins {
 }
 
 group 'org.spongepowered'
-version '1.0.0-SNAPSHOT'
+version '1.0.0'
 description 'A helper library to allow running JUnit tests in a ModLauncher context.'
 
 dependencies {
