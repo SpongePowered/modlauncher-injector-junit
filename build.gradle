@@ -16,8 +16,10 @@ dependencies {
     api "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     implementation "cpw.mods:modlauncher:$modlauncherVersion"
 
+    testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.api
     testRuntimeOnly libs.junit.engine
+    testRuntimeOnly libs.junit.launcher
     errorprone libs.errorprone
     errorprone libs.errorprone.annotations
 }
