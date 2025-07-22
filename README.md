@@ -1,5 +1,14 @@
 # modlauncher-injector-junit
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/KyoriPowered/adventure/build/master) [![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt) [![Maven Central](https://img.shields.io/maven-central/v/org.spongepowered/modlauncher-injector-junit?label=stable)](https://search.maven.org/search?q=g:org.spongepowered%20AND%20a:modlauncher-injector-junit) ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/org.spongepowered/modlauncher-injector-junit?label=dev&server=https%3A%2F%2Foss.sonatype.org)
+![GitHub Workflow Status (branch)](https://github.com/SpongePowered/modlauncher-injector-junit/actions/workflows/ci.yaml/badge.svg) [![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt) [![Maven Central](https://img.shields.io/maven-central/v/org.spongepowered/modlauncher-injector-junit?label=stable)](https://search.maven.org/search?q=g:org.spongepowered%20AND%20a:modlauncher-injector-junit) ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/org.spongepowered/modlauncher-injector-junit?label=dev&server=https%3A%2F%2Foss.sonatype.org)
+
+---
+
+## This repository has been archived. 
+
+This project was developed when there was no proper way to specify a custom classloader to JUnit 5. Today JUnit 5 has a proper API to do that. ModLauncher has also changed quite a lot since. This project is now completely obsolete and has never been used in production by Sponge.
+
+---
+
 
 A helper library to allow running [JUnit] tests in a [ModLauncher] context.
 
